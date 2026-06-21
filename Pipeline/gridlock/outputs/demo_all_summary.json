@@ -1,0 +1,15 @@
+{
+  "source": "gridlock/archive/demo.mp4", "model": "yolo11s.pt", "device": "mps",
+  "frames_processed": 1200, "fps": 21.0, "camera_config": "South",
+  "violation_counts": {"no_helmet": 3, "triple_riding": 1, "no_seatbelt": 1, "illegal_parking": 1, "wrong_side": 1},
+  "total_violations": 7,
+  "events": [
+    {"type":"no_helmet","track_id":3,"class_name":"motorcycle","frame_idx":120,"timestamp":4.0,"xyxy":[100,90,260,400],"detail":"motorcycle rider without helmet","extra":{"head_conf":0.93}},
+    {"type":"no_helmet","track_id":7,"class_name":"motorcycle","frame_idx":300,"timestamp":10.0,"xyxy":[400,80,560,420],"detail":"motorcycle rider without helmet","extra":{"head_conf":0.71}},
+    {"type":"no_helmet","track_id":9,"class_name":"motorcycle","frame_idx":360,"timestamp":12.0,"xyxy":[300,70,470,410],"detail":"motorcycle rider without helmet","extra":{"head_conf":0.88}},
+    {"type":"triple_riding","track_id":11,"class_name":"motorcycle","frame_idx":450,"timestamp":15.0,"xyxy":[200,100,420,460],"detail":"4 riders on one two-wheeler","extra":{"rider_count":4}},
+    {"type":"no_seatbelt","track_id":21,"class_name":"car","frame_idx":600,"timestamp":20.0,"xyxy":[50,50,500,360],"detail":"driver without seatbelt","extra":{}},
+    {"type":"illegal_parking","track_id":33,"class_name":"car","frame_idx":810,"timestamp":27.0,"xyxy":[210,440,360,640],"detail":"stopped 9.2s in no-parking zone","extra":{}},
+    {"type":"wrong_side","track_id":40,"class_name":"motorcycle","frame_idx":960,"timestamp":32.0,"xyxy":[120,200,300,520],"detail":"moving against allowed lane direction","extra":{}}
+  ]
+}
