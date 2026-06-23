@@ -15,9 +15,12 @@ class ViolationThresholds:
     thresholds: dict[ViolationType, float] = field(
         default_factory=lambda: {
             # Helmet is gated on the trained no-helmet head model's confidence.
-            # That model under-scores no-helmet heads on out-of-domain footage,
-            # so the floor is low (0.25); sub-0.85 still routes to human review.
-            ViolationType.helmet:        0.25,
+            # Raised from 0.25 -> 0.5 to favour precision over recall: weak
+            # no-helmet heads (distant / occluded riders on out-of-domain
+            # footage) are the main false-positive source, so we'd rather miss a
+            # borderline rider than register a wrong case. Anything that does
+            # fire is still < 0.85, so it routes to human review, not auto-issue.
+            ViolationType.helmet:        0.5,
             ViolationType.seatbelt:      0.6,
             ViolationType.triple_riding: 0.6,
             ViolationType.wrong_side:    0.6,

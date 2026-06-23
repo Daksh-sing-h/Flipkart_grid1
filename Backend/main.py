@@ -121,12 +121,35 @@ def _pipeline_has_output() -> bool:
     return CONFIRMED_JSONL.exists() or REVIEW_JSONL.exists()
 
 
+def _stable_id(rec: dict, i: int, prefix: str) -> str:
+    """A content-derived id that stays stable across pipeline re-runs.
+
+    The old scheme numbered records positionally (``rq_0000``, ``rq_0001`` …),
+    so after a ``--reset`` the regenerated queue reused the same ids — and any
+    record_id already present in the audit log masked whatever now sat at that
+    position, making freshly-detected violations vanish from the review queue.
+
+    Deriving the id from the violation's frame + detection trace makes it
+    identify the *same* violation every run, so an audit action only ever hides
+    the record it was actually taken on.  Falls back to the positional id only
+    when a record has no detection trace to key off.
+    """
+    vr = rec.get("violation_record", {})
+    rel = vr.get("related_detection_ids") or []
+    vtype = vr.get("violation_type")
+    if vtype and rel:
+        return f"{vtype}:{rel[0]}"
+    if vtype and vr.get("image_id"):
+        return f"{vtype}:{vr['image_id']}"
+    return f"{prefix}_{i:04d}"
+
+
 def _load_violations() -> list[dict]:
     """Real confirmed records once the pipeline has run (even if empty); else mock."""
     if _pipeline_has_output():
         records = _read_jsonl(CONFIRMED_JSONL)
         for i, r in enumerate(records):
-            r.setdefault("id", f"ev_{i:04d}")
+            r.setdefault("id", _stable_id(r, i, "ev"))
             r.setdefault("status", "confirmed")
         return records
     return _read_json(MOCK_DIR / "violations.json") or []
@@ -136,7 +159,7 @@ def _load_review_queue() -> list[dict]:
     if _pipeline_has_output():
         records = _read_jsonl(REVIEW_JSONL)
         for i, r in enumerate(records):
-            r.setdefault("id", f"rq_{i:04d}")
+            r.setdefault("id", _stable_id(r, i, "rq"))
             r.setdefault("status", "pending")
         return records
     return _read_json(MOCK_DIR / "review_queue.json") or []
